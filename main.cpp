@@ -4,7 +4,7 @@
 #include <chrono>
 #include <iomanip>
 
-#define SAMPLES 10000000000
+#define SAMPLES 1000000000
 #define RANDMAX 1000000
 using real10 = long double;
 
@@ -14,7 +14,6 @@ int main()
 {
 	std::mt19937 random(std::_Random_device());
 	std::uniform_int<int> distribution(0, RANDMAX);
-
 	auto getNumber = [&random, &distribution]() mutable
 	{
 		real10 number;
@@ -23,16 +22,27 @@ int main()
 		return number;
 	};
 
-	long circlePointCounter = 0;
-	long notCirclePointCounter = 0;
+	unsigned long long circlePointCounter = 0;
+	unsigned long long notCirclePointCounter = 0;
 
 	real10 x;
 	real10 y;
 
 	auto startingTime = std::chrono::high_resolution_clock::now();
 
-	for(int i=0; i< SAMPLES; i++)
+	int percentageCounter = 0;
+	for(long long unsigned int i=0; i< SAMPLES; i++)
 	{
+		if(percentageCounter >= 1'000'000)
+		{
+			std::cout << (float)i / SAMPLES << "\n";
+			percentageCounter = 0;
+		}else
+		{
+			percentageCounter++;
+		}
+
+
 		x = getNumber();
 		y = getNumber();
 
@@ -51,7 +61,7 @@ int main()
 
 	auto endingTime = std::chrono::high_resolution_clock::now();
 	
-	std::cout << "points inside the circle: " << circlePointCounter << "\n";
+	std::cout << "\n\npoints inside the circle: " << circlePointCounter << "\n";
 	std::cout << "points outside the circle: " << notCirclePointCounter << "\n";
 	std::cout << "evaluated pi: " << std::setprecision(14) << pi << "\n";
 	std::cout << "real      pi: " << "3.14159265358979\n";
@@ -60,6 +70,7 @@ int main()
 	auto deltaTime = endingTime - startingTime;
 	std::cout << "time(nanoseconds): " << deltaTime.count() << std::endl;
 	std::cout << "time(miliseconds): " << std::chrono::duration_cast<std::chrono::milliseconds>(deltaTime).count() << std::endl;
+	std::cout << "time(seconds    ): " << std::chrono::duration_cast<std::chrono::seconds>(deltaTime).count() << std::endl;
 
 	std::cin.get();
 }
